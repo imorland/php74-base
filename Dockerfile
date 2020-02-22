@@ -1,0 +1,91 @@
+FROM php:7.4-apache
+
+# Setup Debian
+RUN apt-get upgrade && apt-get update && ACCEPT_EULA=Y && apt-get install -y \
+        unzip \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libmemcached-dev \
+        libgeoip-dev \
+        libxml2-dev \
+        libxslt-dev \
+        libtidy-dev \
+        libssl-dev \
+        zlib1g-dev \
+        libpng-dev \
+        libjpeg-dev \
+        libwebp-dev \
+        libgmp-dev \
+        libldap2-dev \
+        libaio1 \
+        apt-file \
+        wget \
+        vim \
+        gnupg \
+        gnupg2 \
+        git \
+        libzip-dev \
+        cron \
+        libonig-dev \
+    && pecl install redis \
+    && pecl install geoip-1.1.1 \
+    && pecl install apcu \
+    && pecl install memcached \
+    && pecl install timezonedb \
+    && docker-php-ext-configure gd --enable-gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/  \
+    && docker-php-ext-install gd calendar gmp ldap sysvmsg pcntl iconv bcmath xml mbstring tidy gettext intl pdo pdo_mysql mysqli simplexml tokenizer xml xsl xmlwriter zip opcache exif \
+    && docker-php-ext-enable redis geoip apcu memcached timezonedb
+
+# Enable PHP error logging to stdout
+RUN printf "log_errors = On \nerror_log = /dev/stderr\n" > /usr/local/etc/php/conf.d/php-logs.ini
+
+# Apache settings
+COPY etc/apache2/conf-enabled/host.conf /etc/apache2/conf-enabled/host.conf
+COPY etc/apache2/apache2.conf /etc/apache2/apache2.conf
+COPY etc/apache2/sites-enabled/000-default.conf /etc/apache2/sites-enabled/000-default.conf
+
+# PHP settings
+COPY etc/php/production.ini /usr/local/etc/php/conf.d/production.ini
+
+# Composer
+
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+RUN php composer-setup.php --quiet
+RUN rm composer-setup.php
+RUN mv composer.phar /usr/local/bin/composer
+
+RUN a2enmod proxy && \
+  a2enmod proxy_http && \
+  a2enmod proxy_ajp && \
+  a2enmod rewrite && \
+  a2enmod deflate && \
+  a2enmod headers && \
+  a2enmod proxy_balancer && \
+  a2enmod proxy_connect && \
+  a2enmod ssl && \
+  a2enmod cache && \
+  a2enmod expires && \
+# Run apache on port 8080 instead of 80 due. On linux, ports under 1024 require admin privileges and we run apache as www-data.
+  sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf && \
+  chmod g+w /var/log/apache2 && \
+  chmod 777 /var/lock/apache2 && \
+  chmod 777 /var/run/apache2 && \
+  echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
+
+COPY var/www/html/index.php /var/www/html/index.php
+
+EXPOSE 8080
+
+## Add script to deal with Docker Secrets before starting apache
+COPY secrets.sh /usr/local/bin/secrets
+COPY startup.sh /usr/local/bin/startup
+RUN chmod 755 /usr/local/bin/secrets && chmod 755 /usr/local/bin/startup
+
+### PROD ENVIRONMENT SPECIFIC ###
+################################
+
+ENV PROVISION_CONTEXT "production"
+
+################################
+CMD ["startup"]
