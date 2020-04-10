@@ -28,6 +28,9 @@ RUN apt-get upgrade && apt-get update && ACCEPT_EULA=Y && apt-get install -y \
         libzip-dev \
         cron \
         libonig-dev \
+        unixodbc-dev \
+    && pecl install sqlsrv \
+    && pecl install pdo_sqlsrv \
     && pecl install redis \
     && pecl install geoip-1.1.1 \
     && pecl install apcu \
