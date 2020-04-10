@@ -29,7 +29,7 @@ RUN apt-get upgrade && apt-get update && ACCEPT_EULA=Y && apt-get install -y \
         cron \
         libonig-dev \
         unixodbc-dev \
-        unitodbc \
+        unixodbc \
     && pecl install sqlsrv \
     && pecl install pdo_sqlsrv \
     && pecl install redis \

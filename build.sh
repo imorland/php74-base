@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## The URL of the repo. Do not change unless you're sure about this.
+# The URL of the repo. Do not change unless you're sure about this.
 dev=ianmgg/php74:dev
 latest=ianmgg/php74:latest
 
