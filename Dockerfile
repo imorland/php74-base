@@ -29,6 +29,7 @@ RUN apt-get upgrade && apt-get update && ACCEPT_EULA=Y && apt-get install -y \
         cron \
         libonig-dev \
         unixodbc-dev \
+        unitodbc \
     && pecl install sqlsrv \
     && pecl install pdo_sqlsrv \
     && pecl install redis \
@@ -38,7 +39,7 @@ RUN apt-get upgrade && apt-get update && ACCEPT_EULA=Y && apt-get install -y \
     && pecl install timezonedb \
     && docker-php-ext-configure gd --enable-gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/  \
     && docker-php-ext-install gd calendar gmp ldap sysvmsg pcntl iconv bcmath xml mbstring tidy gettext intl pdo pdo_mysql mysqli simplexml tokenizer xml xsl xmlwriter zip opcache exif \
-    && docker-php-ext-enable redis geoip apcu memcached timezonedb
+    && docker-php-ext-enable redis geoip apcu memcached timezonedb sqlsrv pdo_sqlsrv
 
 # Enable PHP error logging to stdout
 RUN printf "log_errors = On \nerror_log = /dev/stderr\n" > /usr/local/etc/php/conf.d/php-logs.ini
