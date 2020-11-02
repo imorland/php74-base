@@ -1,7 +1,7 @@
 FROM php:7.4-apache
 
 # Setup Debian
-RUN apt-get upgrade && apt-get update && ACCEPT_EULA=Y && apt-get install -y \
+RUN apt-get update && apt-get upgrade && ACCEPT_EULA=Y && apt-get install -y \
         unzip \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
