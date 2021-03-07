@@ -19,11 +19,15 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
     - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ianmgg/php74:latest
+    - name: Build the PHP 7.4 Docker image
+      run: docker build . --file 7.4/Dockerfile --tag ianmgg/php74:latest
     - name: Push :latest
       run: docker push ianmgg/php74:latest
-    - name: Build the dev Docker image
-      run: docker build . --file Dockerfile.dev --tag ianmgg/php74:dev
+    - name: Build the PHP 7.4 dev Docker image
+      run: docker build . --file 7.4/Dockerfile.dev --tag ianmgg/php74:dev
     - name: Push :dev
       run: docker push ianmgg/php74:dev
+    - name: Build the PHP 8.0 Docker image
+      run: docker build . --file 8.0/Dockerfile --tag ianmgg/php80:latest
+    - name: Build the PHP 8.0 dev Docker image
+      run: docker build . --file 8.0/Dockerfile.dev --tag ianmgg/php80:dev
