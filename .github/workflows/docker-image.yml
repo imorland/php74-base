@@ -16,5 +16,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag ianmgg/php74:latest
+    - name: Push :latest
+      run: docker push ianmgg/php74:latest
     - name: Build the dev Docker image
       run: docker build . --file Dockerfile.dev --tag ianmgg/php74:dev
+    - name: Push :dev
+      run: docker push ianmgg/php74:dev
